@@ -3,6 +3,8 @@ var highlight = require('voxel-highlight')
 var player = require('voxel-player')
 var voxel = require('voxel')
 var extend = require('extend')
+var osmDrawer = require('./openstreetmap-drawer')
+var osm = require('./openstreetmap')
 
 module.exports = function() {
 
@@ -21,13 +23,19 @@ module.exports = function() {
   
   // for debugging
   window.world = game 
-  
+
   // Player
   var createPlayer = player(game)
   var avatar = createPlayer('images/player.png')
   avatar.possess()
   avatar.yaw.position.set(0, 2, 0)
   avatar.toggle();
+
+  // OSM
+  var drawer = osmDrawer.Drawer(game, game.scene, avatar)
+  setInterval(function() { //TODO: on move!
+      drawer.updatePos();
+  }, 1000);
   
   // highlight blocks when you look at them, hold <Ctrl> for block placement
   var blockPosPlace, blockPosErase
@@ -57,7 +65,7 @@ module.exports = function() {
 }
 
 function generator(x,y,z) {
-  return y <= 0 && y > -100 ? 1 : 0;
+  return y <= 0 && y > -2 ? 1 : 0;
 }
 
 

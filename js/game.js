@@ -18,7 +18,7 @@ module.exports = function(opts, setup) {
     
     setPos: function(x,y,z) {
     
-    }
+    },
     
     setWatching: function(a,b,g) {
       

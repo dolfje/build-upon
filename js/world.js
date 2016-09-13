@@ -43,16 +43,19 @@ module.exports = function() {
   hl.on('remove-adjacent', function (voxelPos) { blockPosPlace = null })
 
   // block interaction stuff, uses highlight data
-  var currentMaterial = 2
+  var currentMaterial = 2;
   game.on('fire', function (target, state) {
     if (blockPosPlace) {
       game.createBlock(blockPosPlace, currentMaterial);
+      game.emit("addBlock", {x:blockPosPlace[0], y:blockPosPlace[1], z:blockPosPlace[2], type:currentMaterial});
     }
     else if(blockPosErase) {
-      game.setBlock(blockPosErase000, 0);
+      game.setBlock(blockPosErase, 0);
+      game.emit("removeBlock", {x:blockPosErase[0], y:blockPosErase[1], z:blockPosErase[2]});
     }
   });
   
+  game.player = avatar;
   return game
 }
 

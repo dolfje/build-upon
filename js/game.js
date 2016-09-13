@@ -28,14 +28,14 @@ Game.prototype.removeBlock = function(x,y,z) {
 }
 
 Game.prototype.setLatLng = function(lat, lng) {
-  return setPos(
-    (((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,16)))*256*2.387,
+  return this.setPos(
+    Math.round((((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,16)))*256*2.387),
     1,
-    (((lng+180)/360*Math.pow(2,16)))*256*2.387
+    Math.round((((lng+180)/360*Math.pow(2,16)))*256*2.387)
   );      
 };
     
-Game.prototype.setPos = function(x,y,z) {
+Game.prototype.setPos = function(x,y,z) { 
   world.player.moveTo(x, y, z);  
   this.emit("posChange", {x:x,y:y,z:z});    
 };

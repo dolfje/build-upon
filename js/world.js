@@ -60,7 +60,7 @@ module.exports = function() {
 }
 
 function generator(x,y,z) {
-  return y <= 0 && y > -100 ? 1 : 0;
+  return y <= 0 && y > -5 ? 1 : 0;
 }
 
 

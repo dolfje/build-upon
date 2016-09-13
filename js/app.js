@@ -1,2 +1,6 @@
-var game = require('./game')()
+var game = require('./game')();
+require("./sensors")(game);
+require("./network")(game);
+
+window.game = game;
 

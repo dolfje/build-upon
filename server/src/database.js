@@ -86,7 +86,15 @@ class Database {
 	getEntities(vec, radius) {
 		return new Promise((resolve, reject) => {
 			this.dbState().then(function (db) {
-				var entities = db.collection('entities').find();
+				var constraint = {
+					'pos.x': {$lt: vec.x + radius, $gt: vec.x - radius},
+					'pos.y': {$lt: vec.y + radius, $gt: vec.y - radius},
+
+					// Do not put a height constraint (yet)
+					// 'pos.z': {$lt: vec.z + radius, $gt: vec.z - radius}
+				};
+
+				var entities = db.collection('entities').find(constraint);
 
 				entities.toArray(function (err, entities) {
 					if (!err) {

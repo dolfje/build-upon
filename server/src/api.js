@@ -2,7 +2,7 @@
 
 var Database = require('./database'),
 
-	Block = require('./world').Block;
+	Block = require('./entities/block');
 
 class Api {
 	constructor(httpServer) {

@@ -1,0 +1,44 @@
+<html>
+	<head></head>
+	<body>
+		<script>
+		var name = window.prompt('Name');
+
+		var port = 1337,
+			webSocket = new WebSocket('ws://localhost:' + port);
+
+		webSocket.onopen = function () {
+			webSocket.send(JSON.stringify({
+				cmd: 'me.setName',
+				data: name
+			}));
+
+			webSocket.send(JSON.stringify({
+				cmd: 'me.updatePosition',
+				data: {
+					pos: {x: 1, y: 2, z: 3},
+					angle: 0
+				}
+			}));
+
+			webSocket.send(JSON.stringify({
+				cmd: 'block.create',
+				data: {
+					pos: {x: 2, y: 5, z: 10},
+					type: 2
+				}
+			}));
+		};
+
+		webSocket.onmessage = function (event) {
+			var data = JSON.parse(event.data);
+			console.log(data);
+		};
+
+		window.addEventListener('beforeunload', function (event) {
+			// FF whines when the socket isn't closed cleanly
+			webSocket.close();
+		});
+		</script>
+	</body>
+</html>

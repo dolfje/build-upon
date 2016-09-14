@@ -37,31 +37,7 @@ module.exports = function() {
       drawer.updatePos();
   }, 1000);  
   
-  // highlight blocks when you look at them, hold <Ctrl> for block placement
-  var blockPosPlace, blockPosErase
-  var hl = game.highlighter = highlight(game, { 
-    color: 0xff0000, 
-    adjacentActive: function() {
-      return true;
-    }
-  });
-  hl.on('highlight', function (voxelPos) { blockPosErase = voxelPos })
-  hl.on('remove', function (voxelPos) { blockPosErase = null })
-  hl.on('highlight-adjacent', function (voxelPos) { blockPosPlace = voxelPos })
-  hl.on('remove-adjacent', function (voxelPos) { blockPosPlace = null })
-
-  // block interaction stuff, uses highlight data
-  var currentMaterial = 2;
-  game.on('fire', function (target, state) {
-    if (blockPosPlace) {
-      game.createBlock(blockPosPlace, currentMaterial);
-      game.emit("addBlock", {x:blockPosPlace[0], y:blockPosPlace[1], z:blockPosPlace[2], type:currentMaterial});
-    }
-    else if(blockPosErase) {
-      game.setBlock(blockPosErase, 0);
-      game.emit("removeBlock", {x:blockPosErase[0], y:blockPosErase[1], z:blockPosErase[2]});
-    }
-  });
+  setHighlighter(game);
   
   game.player = avatar;
   return game
@@ -69,6 +45,40 @@ module.exports = function() {
 
 function generator(x,y,z) {
   return y <= 0 && y > -2 ? 1 : 0;
+}
+
+function setHighlighter(game) {
+  // highlight blocks when you look at them, hold <Ctrl> for block placement
+  var block;
+  var removeBlock = false;
+  var hl = game.highlighter = highlight(game, { 
+    color: 0xff0000, 
+    adjacentActive: function() {
+      return !removeBlock;
+    }
+  });
+  hl.on('highlight', function (voxelPos) { block = voxelPos });
+  hl.on('remove', function (voxelPos) { block = null });
+  hl.on('highlight-adjacent', function (voxelPos) { block = voxelPos });
+  hl.on('remove-adjacent', function (voxelPos) { block = null });
+
+  // block interaction stuff, uses highlight data
+  game.on('fire', function (target, state) {
+    game.emit("click", block[0], block[1], block[2]);
+  });
+  
+  game.getHighlightMode = function() {
+    return removeBlock ? "remove" : "add";
+  }
+  
+  game.setHighlightMode = function(mode) {
+    if(mode == "remove") {
+      removeBlock = true;
+    }
+    else {
+      removeBlock = false;
+    }
+  }
 }
 
 

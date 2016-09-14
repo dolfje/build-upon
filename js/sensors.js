@@ -14,10 +14,10 @@ module.exports = function(game) {
     navigator.geolocation.watchPosition(function(pos) {
       
       // TODO
-      //game.setLatLng(pos.coords.latitude, pos.coords.longitude);
-      setTimeout(function() {
+      game.setLatLng(pos.coords.latitude, pos.coords.longitude);
+      /*setTimeout(function() {
         game.setPos(0,1,0);
-      }, 500)
+      }, 500)*/
       
       
     });

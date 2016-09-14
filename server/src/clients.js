@@ -26,12 +26,12 @@ class Client extends Connection {
 	constructor(conn) {
 		super(conn);
 		this.id = null;
-		this.pos = new math.Vector;
+		this.coords = new math.Vector;
 		this.angle = 0;
 	}
 
 	updatePosition(vector) {
-		this.pos.set(vector);
+		this.coords.set(vector);
 	}
 
 	updateAngle(angle) {

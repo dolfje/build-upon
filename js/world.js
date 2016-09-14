@@ -35,7 +35,7 @@ module.exports = function() {
   var drawer = osmDrawer.Drawer(game, game.scene, avatar)
   setInterval(function() { //TODO: on move!
       drawer.updatePos();
-  }, 1000);
+  }, 1000);  
   
   // highlight blocks when you look at them, hold <Ctrl> for block placement
   var blockPosPlace, blockPosErase

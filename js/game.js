@@ -1,12 +1,16 @@
 var world = require('./world')();
+var users = require('./users');
 var inherits = require('inherits');
 var events = require('events');
+var aabb = require('aabb-3d');
 
 module.exports = Game;
 
 function Game() {
   if (!(this instanceof Game)) return new Game();
   var self = this;
+  this.users = users(this);
+  this.world = world;
   
   world.on("addBlock", function(data) {
     self.emit("addBlock", data)
@@ -15,6 +19,18 @@ function Game() {
   world.on("removeBlock", function(data) {
     self.emit("removeBlock", data);
   });
+  
+  var box = aabb([-Infinity, -Infinity, -Infinity], [Infinity, Infinity, Infinity]);
+  var position;
+  world.spatial.on("position", box, function(data) { 
+    position = {x:data[0], y:data[1], z:data[2]};
+  });
+  setInterval(function() {
+    if(position) {
+      self.emit("posChange", position);
+      position = false;
+    }
+  }, 100);
 }
 
 Game.prototype.addBlock = function(x,y,z,type) {
@@ -37,10 +53,9 @@ Game.prototype.setLatLng = function(lat, lng) {
     
 Game.prototype.setPos = function(x,y,z) { 
   world.player.moveTo(x, y, z);  
-  this.emit("posChange", {x:x,y:y,z:z});    
 };
 
-Game.prototype.setWatching = function(a,b,g) {
+Game.prototype.setOrientation = function(a,b,g) {
   
 };
 

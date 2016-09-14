@@ -10,7 +10,7 @@ module.exports = function(game) {
     }));
   });
   
-  game.on("removeBlock", function(info) {
+  game.on("removeBlock", function(info) { 
     connection.send(JSON.stringify({
       cmd: "block.delete",
       data: {pos: {x:info.x, y:info.y, z:info.z}, type:info.type},
@@ -24,10 +24,10 @@ module.exports = function(game) {
     }));
   });
   
-  connection.onopen = function () {
+  connection.onopen = function () { 
     connection.send(JSON.stringify({
       cmd: "me.setName",
-      data: "Nikos",
+      data: "Nikos_"+Math.random(),
     }));
   };
 
@@ -41,6 +41,9 @@ module.exports = function(game) {
       if(data.data.name == "Block") {
         game.addBlock(data.data.pos.x, data.data.pos.y, data.data.pos.z, data.data.type);
       }
+    }
+    if(data.cmd == "client.positionUpdated") {
+      game.users.setUser(data.data.client, data.data.pos);
     }
     if(data.cmd == "me.entitiesAroundLocation") {
       for(var i=0; i!=data.data.length; i++) {

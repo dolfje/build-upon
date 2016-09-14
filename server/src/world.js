@@ -8,41 +8,9 @@ var math = require('./math'),
 
 	config = require('./../config'),
 
-	Database = require('./database');
+	Database = require('./database'),
 
-class Entity {
-	constructor(name, pos) {
-		this.name = name;
-
-		if (!(pos instanceof math.Vector)) {
-			pos = new math.Vector(pos);
-		}
-		this.pos = pos;
-	}
-
-	static fromJson(name, json) {
-		var entity = eval('new ' + name + '()');
-
-		entity = Object.assign(entity, json);
-		entity.pos = new math.Vector(entity.pos);
-
-		return entity;
-	}
-}
-
-class Block extends Entity {
-	constructor(pos, type, owner) {
-		super('Block', pos);
-		this.type = type;
-
-		if (owner) {
-			this.owner_id = owner.id;
-		} else {
-			// Indicate that the block is a system block, doesn't belong to anyone.
-			this.system_block = true;
-		}
-	}
-}
+	Block = require('./entities/block');
 
 class World {
 	constructor(clients) {
@@ -81,7 +49,7 @@ class World {
 		}
 
 		this.getEntity(pos).then((block) => {
-			block = block ? Block.fromJson('Block', block) : null;
+			block = block ? Block.fromJson(block) : null;
 
 			switch (action) {
 
@@ -170,7 +138,4 @@ class World {
 	}
 }
 
-module.exports = {
-	World: World,
-	Block: Block
-};
+module.exports = World;

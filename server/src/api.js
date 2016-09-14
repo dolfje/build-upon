@@ -2,7 +2,7 @@
 
 var Database = require('./database'),
 
-	Block = require('./world').Block;
+	Block = require('./entities/block');
 
 class Api {
 	constructor(httpServer) {
@@ -12,7 +12,7 @@ class Api {
 
 	setupRoutes() {
 		this.httpServer.post('/api/block', (request, response) => {
-			var block = Block.fromJson('Block', request.body);
+			var block = Block.fromJson(request.body);
 
 			this.database.getEntity(block.pos).then((found) => {
 				if (!found) {

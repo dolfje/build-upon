@@ -68,7 +68,7 @@ class Database {
 
 	getEntity(vec) {
 		return new Promise((resolve, reject) => {
-			this.dbState().then(function (db) {
+			this.dbState().then((db) => {
 				db.collection('entities').findOne({
 					pos: vec
 				}, function (err, result) {

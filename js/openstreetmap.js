@@ -24,6 +24,7 @@ module.exports = function() {
         Y: 1,
         Z: 2,
         URL: 3,
+        ZOOM: zoom,
         M_PER_PIXEL: m_per_pixel,
 
         load: function(x_min, z_min, x_max, z_max) {

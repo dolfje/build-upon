@@ -17,10 +17,9 @@ module.exports = {
                 {
                     return
                 }
-
                 var x = this.last_x = pos.x;
                 var z = this.last_z = pos.z;
-                
+
                 var radius = 300;
                 var images = OSM.load(x - radius, z - radius, x + radius, z + radius);
                 for (var i=0; i<images.length; i++) {
@@ -28,10 +27,15 @@ module.exports = {
                     this.draw(data[0], data[1], data[2], data[3]);
                 }
             },
+            reset: function() {
+                this.drawn.forEach(function(item) {
+                    this.scene.remove(item);
+                });
+                this.drawn = []
+            },
             draw: function(x, y, z, url) {
                 if (this.drawn[x+":"+z])
                     return;
-                this.drawn[x+":"+z] = true;
 
                 var geometry = new THREE.PlaneGeometry(256 * OSM.M_PER_PIXEL, 256 * OSM.M_PER_PIXEL);
                 var material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide} );
@@ -42,6 +46,13 @@ module.exports = {
                 plane.rotation.x = -90*Math.PI/180;
                 plane.position.z = z;
                 this.scene.add( plane );
+
+                this.drawn[x+":"+z] = plane;
+            },
+            updateOffset: function(x, y, z) {
+                OSM.START_X = x
+                OSM.START_2 = z
+                this.reset()
             }
         }
     }

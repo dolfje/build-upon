@@ -1,6 +1,6 @@
 module.exports = function(game) {
   
-  var endpoint = "192.168.1.9:1337";
+  var endpoint = "localhost:1337";
   var connection = new WebSocket('ws://'+endpoint+'/');
 
   game.on("addBlock", function(info) { 
@@ -36,10 +36,10 @@ module.exports = function(game) {
   };
 
   connection.onmessage = function (e) { 
-    var data = JSON.parse(event.data);
+    var data = JSON.parse(e.data);
     if(data.cmd == "world.entityUpdated") {
       if(data.data.name == "Block") {
-        game.addBlock(data.data.pos.x, data.data.pos.y, data.data.pos.z, data.data.type);
+        game.addBlockInner(data.data.pos.x, data.data.pos.y, data.data.pos.z, data.data.type);
       }
     }
     if(data.cmd == "client.positionUpdated") {
@@ -47,7 +47,7 @@ module.exports = function(game) {
     }
     if(data.cmd == "me.entitiesAroundLocation") {
       for(var i=0; i!=data.data.length; i++) {
-        game.addBlock(data.data[i].pos.x, data.data[i].pos.y, data.data[i].pos.z, data.data[i].type);
+        game.addBlockInner(data.data[i].pos.x, data.data[i].pos.y, data.data[i].pos.z, data.data[i].type);
       }
       
       

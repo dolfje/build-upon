@@ -1,0 +1,18 @@
+{
+  "name": "build-upon-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "express": "^4.14.0",
+    "nodejs-websocket": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Matthias Van Parijs <matvp91@gmail.com>",
+  "license": "MIT"
+}

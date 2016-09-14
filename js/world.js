@@ -35,8 +35,10 @@ module.exports = function() {
   var drawer = osmDrawer.Drawer(game, game.scene, avatar)
   game.osmDrawer = drawer;
 
-  var start_x = 32000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
-  var start_z = 24000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
+  //var start_x = 32000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
+  //var start_z = 24000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
+  var start_x = 21322808
+  var start_z = 13906911
   avatar.yaw.position.set(start_x, 2, start_z)
   
   setHighlighter(game);

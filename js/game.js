@@ -52,8 +52,13 @@ inherits(Game, events.EventEmitter)
 
 Game.prototype.addBlock = function(x,y,z,type) {
   var self = this;
-  world.createBlock([x-self.offset.x,y-self.offset.y,z-self.offset.z], type);
+  this.addBlockInner(x,y,z,type);
   this.emit("addBlock", {x:x,y:y,z:z,type:type});
+};
+
+Game.prototype.addBlockInner = function(x,y,z,type) {
+  var self = this;
+  world.createBlock([x-self.offset.x,y-self.offset.y,z-self.offset.z], type);
 };
 
 Game.prototype.removeBlock = function(x,y,z) {

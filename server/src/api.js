@@ -29,6 +29,17 @@ class Api {
 				}
 			});
 		});
+
+		this.httpServer.get('/api/entities', (request, response) => {
+			this.database.entitiesCounts().then(function (counts) {
+				response.json(counts);
+			});
+		});
+
+		this.httpServer.delete('/api/entities',(request, response) => {
+			this.database.clear('entities');
+			response.json(true);
+		});
 	}
 }
 

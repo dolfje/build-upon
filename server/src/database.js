@@ -83,9 +83,23 @@ class Database {
 		});
 	}
 
+	entitiesCounts() {
+		return new Promise((resolve, reject) => {
+			this.dbState().then((db) => {
+				db.collection('entities').aggregate([
+       				{$group: {'_id': '$name', 'count': {$sum: 1}}}
+     			]).toArray(function (err, result) {
+     				if (!err) {
+     					resolve(result);
+     				}
+     			});
+			});
+		});
+	}
+
 	getEntities(vec, radius) {
 		return new Promise((resolve, reject) => {
-			this.dbState().then(function (db) {
+			this.dbState().then((db) => {
 				var constraint = {
 					'pos.x': {$lt: vec.x + radius, $gt: vec.x - radius},
 					'pos.y': {$lt: vec.y + radius, $gt: vec.y - radius},
@@ -122,6 +136,12 @@ class Database {
 					}
 				});
 			});
+		});
+	}
+
+	clear(collection) {
+		this.dbState().then((db) => {
+			db.collection(collection).remove({});
 		});
 	}
 }

@@ -17,22 +17,13 @@ class Database {
 		this.dbState().then((db) => {
 			var entitiesCollection = db.collection('entities');
 
-			// Add plane 2d index.
+			// Add unique index for pos.
 			entitiesCollection.ensureIndex({
-				plane: '2d'
-			}, null, function (err, result) {
-				if (err) {
-					console.log(colors.red('Failed to set index for plane: 2d'), err);
-				}
-			});
-
-			// Add unique index for coords.
-			entitiesCollection.ensureIndex({
-				coords: 1
+				pos: 1
 			}, {unique: true}, function (err, result) {
 				// ensureIndex should check if the index is already set, if not the case, err code is 11000, exclude anyways
 				if (err && err.code !== 11000) {
-					console.log(colors.red('Failed to set unique index for coords'), err);
+					console.log(colors.red('Failed to set unique index for pos'), err);
 				}
 			});
 		});
@@ -79,7 +70,7 @@ class Database {
 		return new Promise((resolve, reject) => {
 			this.dbState().then(function (db) {
 				db.collection('entities').findOne({
-					coords: vec
+					pos: vec
 				}, function (err, result) {
 					if (!err) {
 						resolve(result);
@@ -92,22 +83,19 @@ class Database {
 		});
 	}
 
-	getEntities(vec, radius, fn) {
-		this.dbState().then(function (db) {
-			var entities = db.collection('entities').find({
-				plane: {
-					$geoWithin: {
-						$center: [vec.plane(), radius]
-					}
-				}
-			});
+	getEntities(vec, radius) {
+		return new Promise((resolve, reject) => {
+			this.dbState().then(function (db) {
+				var entities = db.collection('entities').find();
 
-			entities.toArray(function (err, entities) {
-				if (!err) {
-					fn(entities);
-				} else {
-					console.log(colors.red('Failed to get all from DB'), err);
-				}
+				entities.toArray(function (err, entities) {
+					if (!err) {
+						resolve(entities);
+					} else {
+						console.log(colors.red('Failed to get all from DB'), err);
+						reject();
+					}
+				});
 			});
 		});
 	}

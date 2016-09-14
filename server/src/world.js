@@ -13,6 +13,10 @@ var math = require('./math'),
 class Entity {
 	constructor(name, pos) {
 		this.name = name;
+
+		if (!(pos instanceof math.Vector)) {
+			pos = new math.Vector(pos);
+		}
 		this.pos = pos;
 	}
 
@@ -23,20 +27,6 @@ class Entity {
 		entity.pos = new math.Vector(entity.pos);
 
 		return entity;
-	}
-
-	set pos(vec) {
-		if (!(vec instanceof math.Vector)) {
-			vec = new math.Vector(vec);
-		}
-		this.coords = vec;
-
-		// Store a plane for indexed lookup.
-		this.plane = vec.plane();
-	}
-
-	get pos() {
-		return this.coords;
 	}
 }
 
@@ -76,12 +66,10 @@ class World {
 		return this.database.removeEntity(vec);
 	}
 
-	entitiesAroundClient(client, fn) {
+	entitiesAroundClient(client) {
 		var radius = config.entity_user_radius;
 
-		this.database.getEntities(client.pos, radius, function (entities) {
-			fn(entities);
-		});
+		return this.database.getEntities(client.pos, radius);
 	}
 
 	handleBlock(action, data) {
@@ -172,7 +160,7 @@ class World {
 				});
 
 				// Send back to the client the latest entities around him.
-				this.entitiesAroundClient(payload.client, function (entities) {
+				this.entitiesAroundClient(payload.client).then((entities) => {
 					payload.client.send('me.entitiesAroundLocation', entities);
 				});
 

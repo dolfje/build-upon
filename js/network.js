@@ -49,9 +49,6 @@ module.exports = function(game) {
       for(var i=0; i!=data.data.length; i++) {
         game.addBlockInner(data.data[i].pos.x, data.data[i].pos.y, data.data[i].pos.z, data.data[i].type);
       }
-      
-      
-
     }
   };
   

@@ -47,6 +47,9 @@ class Block extends Entity {
 
 		if (owner) {
 			this.owner_id = owner.id;
+		} else {
+			// Indicate that the block is a system block, doesn't belong to anyone.
+			this.system_block = true;
 		}
 	}
 }
@@ -61,16 +64,16 @@ class World {
 		this.database.migrate();
 	}
 
-	getEntity(vec, cb) {
-		this.database.getEntity(vec, cb);
+	getEntity(vec) {
+		return this.database.getEntity(vec);
 	}
 
 	addEntity(entity) {
-		this.database.saveEntity(entity);
+		return this.database.saveEntity(entity);
 	}
 
 	removeEntity(vec) {
-		this.database.removeEntity(vec);
+		return this.database.removeEntity(vec);
 	}
 
 	entitiesAroundClient(client, fn) {
@@ -89,7 +92,7 @@ class World {
 			return;
 		}
 
-		this.getEntity(pos, (block) => {
+		this.getEntity(pos).then((block) => {
 			block = block ? Block.fromJson('Block', block) : null;
 
 			switch (action) {
@@ -179,4 +182,7 @@ class World {
 	}
 }
 
-module.exports = World;
+module.exports = {
+	World: World,
+	Block: Block
+};

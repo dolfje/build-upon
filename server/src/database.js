@@ -14,64 +14,86 @@ class Database {
 	}
 
 	migrate() {
-		this.dbState(function (db) {
+		this.dbState().then((db) => {
 			var entitiesCollection = db.collection('entities');
 
+			// Add plane 2d index.
 			entitiesCollection.ensureIndex({
 				plane: '2d'
 			}, null, function (err, result) {
 				if (err) {
-					console.log(colors.red('Failed to set index for plane: 2d'));
+					console.log(colors.red('Failed to set index for plane: 2d'), err);
+				}
+			});
+
+			// Add unique index for coords.
+			entitiesCollection.ensureIndex({
+				coords: 1
+			}, {unique: true}, function (err, result) {
+				// ensureIndex should check if the index is already set, if not the case, err code is 11000, exclude anyways
+				if (err && err.code !== 11000) {
+					console.log(colors.red('Failed to set unique index for coords'), err);
 				}
 			});
 		});
 	}
 
-	dbState(fn) {
-		if (!this.connected) {
-			MongoClient.connect(config.mongo_db, (err, db) => {
-				if (!err) {
-					this.db = db;
-					fn(db);
-				} else {
-					console.log(colors.red('Failed to connect to DB'), err);
-				}
-			});
-		} else {
-			fn(this.db);
-		}
+	dbState() {
+		return new Promise((resolve, reject) => {
+			if (!this.connected) {
+				MongoClient.connect(config.mongo_db, (err, db) => {
+					if (!err) {
+						this.db = db;
+						resolve(db);
+					} else {
+						console.log(colors.red('Failed to connect to DB'), err);
+						reject();
+					}
+				});
+			} else {
+				resolve(db);
+			}
+		});
 	}
 
 	save(collection, object) {
-		this.dbState(function (db) {
-			db.collection(collection).insertOne(object, function (err, rs) {
-				if (err) {
-					console.log(colors.red('Failed to save to DB'), err);
-				}
+		return new Promise((resolve, reject) => {
+			this.dbState().then((db) => {
+				db.collection(collection).insertOne(object, (err, result) => {
+					if (err) {
+						console.log(colors.red('Failed to save to DB'), err);
+						reject();
+					} else {
+						resolve(result);
+					}
+				});
 			});
 		});
 	}
 
 	saveEntity(entity) {
-		this.save('entities', entity);
+		return this.save('entities', entity);
 	}
 
-	getEntity(vec, fn) {
-		this.dbState(function (db) {
-			db.collection('entities').findOne({
-				coords: vec
-			}, function (err, result) {
-				if (!err) {
-					fn(result);
-				} else {
-					console.log(colors.red('Failed to get from DB'), err);
-				}
+	getEntity(vec) {
+		return new Promise((resolve, reject) => {
+			this.dbState().then(function (db) {
+				db.collection('entities').findOne({
+					coords: vec
+				}, function (err, result) {
+					if (!err) {
+						resolve(result);
+					} else {
+						console.log(colors.red('Failed to get from DB'), err);
+						reject();
+					}
+				});
 			});
 		});
 	}
 
 	getEntities(vec, radius, fn) {
-		this.dbState(function (db) {
+		this.dbState().then(function (db) {
 			var entities = db.collection('entities').find({
 				plane: {
 					$geoWithin: {
@@ -91,13 +113,18 @@ class Database {
 	}
 
 	removeEntity(vec) {
-		this.dbState(function (db) {
-			db.collection('entities').deleteOne({
-				pos: vec
-			}, function (err) {
-				if (err) {
-					console.log(colors.red('Failed to delete from DB'), err);
-				}
+		return new Promise((resolve, reject) => {
+			this.dbState(function (db) {
+				db.collection('entities').deleteOne({
+					pos: vec
+				}, function (err) {
+					if (err) {
+						console.log(colors.red('Failed to delete from DB'), err);
+						reject();
+					} else {
+						resolve();
+					}
+				});
 			});
 		});
 	}

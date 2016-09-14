@@ -2,7 +2,7 @@
 
 var Clients = require('./clients'),
 
-	World = require('./world'),
+	World = require('./world').World,
 
 	colors = require('colors');
 

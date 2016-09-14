@@ -3,10 +3,13 @@ var config = require('./../config'),
 	websocket = require('nodejs-websocket'),
 	express = require('express'),
 
+	API = require('./api'),
+
 	socketHandler = require('./handler'),
 	socketServer = null,
 
-	httpServer = null;
+	httpServer = null,
+	bodyParser = require('body-parser');
 
 function runSocketServer() {
 	var port = config.socket_port,
@@ -39,6 +42,10 @@ function runHttpServer() {
 	httpServer = express(); 
 	httpServer.use(express.static('client'));
 	httpServer.listen(port);
+	httpServer.use(bodyParser.json());
+
+	var api = new API(httpServer);
+	api.setupRoutes();
 
 	console.log('Running http server on port ' + port);
 }

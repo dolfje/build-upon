@@ -2,6 +2,6 @@ var app = require('./src/app'),
 	
 	colors = require('colors');
 
-console.log(colors.rainbow('CraftServer! (O_O)'));
+console.log(colors.rainbow('build-upon server'));
 
 app.run();

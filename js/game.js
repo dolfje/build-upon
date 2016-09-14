@@ -21,12 +21,16 @@ function Game() {
   
   // Create posChange events
   var box = aabb([-Infinity, -Infinity, -Infinity], [Infinity, Infinity, Infinity]);
-  var position;
+  var position = {x:0,y:0,z:0};
+  var updatePos = false;
   world.spatial.on("position", box, function(data) { 
-    position = {x:data[0], y:data[1], z:data[2]};
+    if (data[0] != position.x || data[1] != position.y || data[2] != position.x) {
+        position = {x:data[0], y:data[1], z:data[2]};
+        updatePos = true;
+    }
   });
   setInterval(function() {
-    if (position) {
+    if (updatePos) {
       var x = self.offset.x+position.x;
       var y = self.offset.y+position.y;
       var z = self.offset.z+position.z;
@@ -38,7 +42,7 @@ function Game() {
       }
 
       self.emit("posChange", {x: x, y: y, z: z});
-      position = false;
+      updatePos = false;
       self.world.osmDrawer.updatePos();
     }
   }, 1000);

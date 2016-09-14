@@ -24,6 +24,10 @@ class Vector {
 		return this.x !== undefined && this.y !== undefined && this.z !== undefined;
 	}
 
+	plane() {
+		return [this.x, this.y];
+	}
+
 	static empty() {
 		return new Vector;
 	}

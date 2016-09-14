@@ -13,6 +13,13 @@
 				data: name
 			}));
 
+			// webSocket.send(JSON.stringify({
+			// 	cmd: 'block.delete',
+			// 	data: {
+			// 		pos: {x: 2, y: 5, z: 10}
+			// 	}
+			// }));
+
 			webSocket.send(JSON.stringify({
 				cmd: 'me.updatePosition',
 				data: {

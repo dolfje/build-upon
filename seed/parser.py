@@ -14,13 +14,25 @@ def deg2num(lat_deg, lon_deg):
 
 def extractBuildings(tree):
     for node in tree.iter("way"):
+        building = []
+        height = None
         for tag in node.iter("tag"):
             if tag.get("k") == "building":
-                building = []
+                assert len(building) == 0
                 for i in node.iter("nd"):
                     building.append(i.get("ref"))
-                yield building
-                break
+            if tag.get("k") == "building:levels":
+                if not height:
+                    height = 2 + int(round(float(tag.get("v")))) * 2
+            if tag.get("k") == "height":
+                v = tag.get("v")
+                if v[-1] == "m":
+                    v = v[0:-1]
+                height = 2 + int(round(float(v)))
+        if not height:
+            height = 2 + 4
+        if len(building) > 0:
+            yield building, height
 
 def createTranslation(tree):
     translate = {}
@@ -138,10 +150,11 @@ with open('building.osm', 'rt') as f:
     count = 0
 
     trans = createTranslation(tree)
-    for building in extractBuildings(tree):
+    for building, height in extractBuildings(tree):
         print "building", count
         translateBuildings([building], trans)
         data = createMatrix(building)
+        data[3] = height
 
         matrix, offset_x, offset_y, height = data
         print offset_x, offset_y, height

@@ -40,7 +40,7 @@ module.exports = function() {
   var start_x = 21322768
   var start_z = 13906911
   avatar.yaw.position.set(start_x, 2, start_z)
-  
+
   setHighlighter(game);
   
   game.player = avatar;
@@ -57,18 +57,20 @@ function setHighlighter(game) {
   var removeBlock = false;
   var hl = game.highlighter = highlight(game, { 
     color: 0xff0000, 
-    adjacentActive: function() {
+    /*adjacentActive: function() {
       return !removeBlock;
-    }
+    }*/
   });
-  hl.on('highlight', function (voxelPos) { block = voxelPos });
+  hl.on('highlight', function (voxelPos) { block = voxelPos; removeBlock = true });
   hl.on('remove', function (voxelPos) { block = null });
-  hl.on('highlight-adjacent', function (voxelPos) { block = voxelPos });
+  hl.on('highlight-adjacent', function (voxelPos) { block = voxelPos; removeBlock = false });
   hl.on('remove-adjacent', function (voxelPos) { block = null });
 
   // block interaction stuff, uses highlight data
   game.on('fire', function (target, state) {
-    game.emit("click", block[0], block[1], block[2]);
+    if(block) {
+      game.emit("click", block[0], block[1], block[2]);
+    }
   });
   
   game.getHighlightMode = function() {

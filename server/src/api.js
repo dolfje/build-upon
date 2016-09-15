@@ -48,10 +48,10 @@ class Api {
 
                     var block = Block.fromJson(request.body[i]);
                     saveEntities.push(this.database.saveEntity(block));
-                    console.log(block.pos)
                 }
 
                 Promise.all(saveEntities).then((a) => {
+                    console.log("added "+saveEntities.length+" blocks")
                     response.json({
                         ok: true,
                         count: saveEntities.length

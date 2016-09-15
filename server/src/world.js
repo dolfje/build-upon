@@ -34,10 +34,8 @@ class World {
 		return this.database.removeEntity(vec);
 	}
 
-	entitiesAroundClient(client) {
-		var radius = config.entity_user_radius;
-
-		return this.database.getEntities(client.pos, radius);
+	entitiesAroundClient(pos, radius) {
+		return this.database.getEntities(pos, radius);
 	}
 
 	handleBlock(action, data) {
@@ -126,9 +124,13 @@ class World {
 						angle: angle
 					});
 				});
+				break;
+
+			case 'getBlocks':
 
 				// Send back to the client the latest entities around him.
-				this.entitiesAroundClient(payload.client).then((entities) => {
+				this.entitiesAroundClient(payload.data.pos, payload.data.radius).then((entities) => {
+                    console.log("entities", entities.length)
 					payload.client.send('me.entitiesAroundLocation', entities);
 				});
 

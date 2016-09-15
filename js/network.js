@@ -23,6 +23,13 @@ module.exports = function(game) {
       data: {pos: pos, angle: 0},
     }));
   });
+
+  game.on("getBlocks", function(pos, radius) {
+    connection.send(JSON.stringify({
+      cmd: "me.getBlocks",
+      data: {pos: pos, radius: radius },
+    }));
+  });
   
   connection.onopen = function () { 
     connection.send(JSON.stringify({
@@ -46,6 +53,7 @@ module.exports = function(game) {
       game.users.setUser(data.data.client, data.data.pos);
     }
     if(data.cmd == "me.entitiesAroundLocation") {
+      console.log("update entities")
       for(var i=0; i!=data.data.length; i++) {
         game.addBlockInner(data.data[i].pos.x, data.data[i].pos.y, data.data[i].pos.z, data.data[i].type);
       }
@@ -55,3 +63,4 @@ module.exports = function(game) {
   
 }
 
+var amount = 0;

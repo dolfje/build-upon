@@ -35,6 +35,7 @@ class Database {
 				MongoClient.connect(config.mongo_db, (err, db) => {
 					if (!err) {
 						this.db = db;
+                        this.connected = true;
 						resolve(db);
 					} else {
 						console.log(colors.red('Failed to connect to DB'), err);
@@ -42,7 +43,7 @@ class Database {
 					}
 				});
 			} else {
-				resolve(db);
+				resolve(this.db);
 			}
 		});
 	}
@@ -102,7 +103,8 @@ class Database {
 			this.dbState().then((db) => {
 				var constraint = {
 					'pos.x': {$lt: vec.x + radius, $gt: vec.x - radius},
-					'pos.y': {$lt: vec.y + radius, $gt: vec.y - radius},
+					'pos.z': {$lt: vec.z + radius, $gt: vec.z - radius},
+					//'pos.y': {$lt: vec.y + radius, $gt: vec.y - radius},
 
 					// Do not put a height constraint (yet)
 					// 'pos.z': {$lt: vec.z + radius, $gt: vec.z - radius}

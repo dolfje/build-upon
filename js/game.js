@@ -47,6 +47,21 @@ function Game() {
     }
   }, 1000);
 
+  var loaded = {x:-1, y:-1, z:-1};
+  this.on('posChange', function(pos) {
+    var radius = 50;
+    var tile_pos = {
+        x: Math.round(pos.x / radius * 2) * radius / 2,
+        y: pos.y,
+        z: Math.round(pos.z / radius * 2) * radius / 2
+    }
+
+    if (loaded.x != tile_pos.x || loaded.y != tile_pos.y || loaded.z != tile_pos.z) {
+        console.log("request blocks", tile_pos)
+        loaded = tile_pos;
+        this.emit("getBlocks", tile_pos, radius)
+    }
+  });
   this.on('offsetChanged', function(offset) {
     self.world.osmDrawer.updateOffset(offset.x, offset.y, offset.z);
   });

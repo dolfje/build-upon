@@ -13,39 +13,26 @@ def deg2num(lat_deg, lon_deg):
   return (xtile * 256 * mperpixel, ytile * 256 * mperpixel)
 
 def extractBuildings(tree):
-    buildings = []
-    count = 0
     for node in tree.iter("way"):
         for tag in node.iter("tag"):
             if tag.get("k") == "building":
                 building = []
                 for i in node.iter("nd"):
                     building.append(i.get("ref"))
-                buildings.append(building)
+                yield building
                 break
-        count += 1
-        if count > 100:
-            break
-    return buildings
 
-def createTranslation(tree, buildings):
+def createTranslation(tree):
     translate = {}
-    for building in buildings:
-        for ref in building:
-            translate[ref] = None
-
     for node in tree.iter("node"):
-        if node.get("id") in translate:
-            num = deg2num(float(node.get("lat")), float(node.get("lon")))
-            translate[node.get("id")] = num
+        num = deg2num(float(node.get("lat")), float(node.get("lon")))
+        translate[node.get("id")] = num
     return translate
 
 def translateBuildings(buildings, translate):
     for building in buildings:
         for i in range(len(building)):
-            print translate[building[i]]
             building[i] = list(translate[building[i]])
-            print building[i][0]*1.0, building[i][1]*1.0
 
 def createMatrix(building):
     offset_x = building[0][0]
@@ -61,15 +48,12 @@ def createMatrix(building):
             offset_y = building[i][1]
         if building[i][1] > max_y:
             max_y = building[i][1]
-    print offset_x
     offset_x = int(math.floor(offset_x))
     offset_y = int(math.floor(offset_y))
     max_x = int(math.ceil(max_x))
     max_y = int(math.ceil(max_y))
     width = int(max_x - offset_x) + 1
     height = int(max_y - offset_y) + 1
-
-    print width, height
 
     import scipy.misc
     import scipy.ndimage
@@ -80,11 +64,6 @@ def createMatrix(building):
         point1 = building[i-1]
         point2 = building[i]
 
-        print "--"
-        print point1[1] - offset_y
-        print point1[0] - offset_x
-        print point2[1] - offset_y
-        print point2[0] - offset_x
         rr, cc, val = line_aa(int(round(point1[1] - offset_y)),
                               int(round(point1[0] - offset_x)),
                               int(round(point2[1] - offset_y)),
@@ -98,10 +77,19 @@ def createMatrix(building):
         matrix.append([])
         for j in range(height):
             matrix[i].append(img[j,i])
-    printMatrix(matrix)
     return [matrix, offset_x, offset_y, 6]
 
 def printMatrix(matrix):
+    max_ = 40
+    while len(matrix) > max_ or len(matrix[0]) > max_:
+        print "shortened"
+        matrix_n = []
+        for row in range(0, len(matrix[0]), 2):
+            matrix_n.append([])
+            for  col in range(0, len(matrix), 2):
+                matrix_n[row/2].append(matrix[col][row])
+        matrix = matrix_n
+
     for row in range(len(matrix[0])):
         for  col in range(len(matrix)):
             if matrix[col][row]:
@@ -139,8 +127,7 @@ def sendBlocks(blocks):
               "type": 2
         });
         if len(data) > 100:
-            print "send chunk of", len(data)
-            r = session.post("http://localhost:8002/api/blocks", json=data, headers={'Connection':'close'})
+            r = session.post("http://localhost:8002/api/blocks", data=json.dumps(data), headers={"content-type": "application/json"})
             assert r.status_code == 200
             assert json.loads(r.text)["ok"]
             data = []
@@ -148,14 +135,21 @@ def sendBlocks(blocks):
 with open('building.osm', 'rt') as f:
     tree = ElementTree.parse(f)
 
-    buildings = extractBuildings(tree)
-    trans = createTranslation(tree, buildings)
-    translateBuildings(buildings, trans)
-    for i in range(len(buildings)):
-        data = createMatrix(buildings[i])
+    count = 0
+
+    trans = createTranslation(tree)
+    for building in extractBuildings(tree):
+        print "building", count
+        translateBuildings([building], trans)
+        data = createMatrix(building)
+
+        matrix, offset_x, offset_y, height = data
+        print offset_x, offset_y, height
+        printMatrix(matrix)
+
         blocks = createBlocks(data)
         sendBlocks(blocks)
 
-        if i > 1000:
-            die()
-
+        count += 1
+        #if count > 10000:
+        #    die()

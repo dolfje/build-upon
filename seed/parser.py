@@ -40,14 +40,12 @@ def createTranslation(tree, buildings):
             translate[node.get("id")] = num
     return translate
 
-def drawBuilding(building):
-    pass
-
 def translateBuildings(buildings, translate):
     for building in buildings:
         for i in range(len(building)):
             print translate[building[i]]
             building[i] = list(translate[building[i]])
+            print building[i][0]*1.0, building[i][1]*1.0
 
 def createMatrix(building):
     offset_x = building[0][0]
@@ -56,13 +54,14 @@ def createMatrix(building):
     max_y = 0
     for i in range(len(building)):
         if building[i][0] < offset_x:
-            offset_x = buildings
+            offset_x = building[i][0]
         if building[i][0] > max_x:
             max_x = building[i][0]
         if building[i][1] < offset_y:
             offset_y = building[i][1]
         if building[i][1] > max_y:
             max_y = building[i][1]
+    print offset_x
     offset_x = int(math.floor(offset_x))
     offset_y = int(math.floor(offset_y))
     max_x = int(math.ceil(max_x))
@@ -100,7 +99,7 @@ def createMatrix(building):
         for j in range(height):
             matrix[i].append(img[j,i])
     printMatrix(matrix)
-    return [matrix, offset_x, offset_y, 4]
+    return [matrix, offset_x, offset_y, 6]
 
 def printMatrix(matrix):
     for row in range(len(matrix[0])):
@@ -125,19 +124,26 @@ def createBlocks(data):
 
 def sendBlocks(blocks):
     import requests
+    import json
+
+    session = requests.Session()
+
+    data = []
     for block in blocks:
-        print block
-        r = requests.post("http://localhost:8002/api/block",
-                          data={
-                                 "pos": {
-                                     "x": block[0],
-                                     "y": block[1],
-                                     "z": block[2]
-                                  },
-                                  "type": 0
-        })
-        assert r.status_code == 200
-        die()
+        data.append({
+            "pos": {
+                 "x": block[0],
+                 "y": block[1],
+                 "z": block[2]
+              },
+              "type": 2
+        });
+        if len(data) > 100:
+            print "send chunk of", len(data)
+            r = session.post("http://localhost:8002/api/blocks", json=data, headers={'Connection':'close'})
+            assert r.status_code == 200
+            assert json.loads(r.text)["ok"]
+            data = []
     
 with open('map.osm', 'rt') as f:
     tree = ElementTree.parse(f)
@@ -150,7 +156,6 @@ with open('map.osm', 'rt') as f:
         blocks = createBlocks(data)
         sendBlocks(blocks)
 
-        die()
-        #print buildings[i]
-        
+        if i > 1000:
+            die()
 

@@ -145,7 +145,7 @@ def sendBlocks(blocks):
             assert json.loads(r.text)["ok"]
             data = []
     
-with open('map.osm', 'rt') as f:
+with open('building.osm', 'rt') as f:
     tree = ElementTree.parse(f)
 
     buildings = extractBuildings(tree)

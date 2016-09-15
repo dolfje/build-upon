@@ -12,14 +12,7 @@ module.exports = function(game) {
   
   if(window.navigator && window.navigator.geolocation) {
     navigator.geolocation.watchPosition(function(pos) {
-      
-      // TODO
-      game.setLatLng(pos.coords.latitude, pos.coords.longitude);
-      /*setTimeout(function() {
-        game.setPos(0,1,0);
-      }, 500)*/
-      
-      
+      game.setLatLng(pos.coords.latitude, pos.coords.longitude);      
     });
   }  
 }

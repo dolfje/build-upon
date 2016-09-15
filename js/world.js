@@ -51,9 +51,9 @@ function setHighlighter(game) {
   var removeBlock = false;
   var hl = game.highlighter = highlight(game, { 
     color: 0xff0000, 
-    adjacentActive: function() {
+    /*adjacentActive: function() {
       return !removeBlock;
-    }
+    }*/
   });
   hl.on('highlight', function (voxelPos) { block = voxelPos; removeBlock = true });
   hl.on('remove', function (voxelPos) { block = null });

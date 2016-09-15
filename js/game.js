@@ -6,16 +6,23 @@ var aabb = require('aabb-3d');
 
 function Game() {
   if (!(this instanceof Game)) return new Game();
+  
   var self = this;
   this.users = users(this);
   this.world = world;
   this.offset = {x:0, y:0, z:0};
   
   world.on("click", function(x,y,z) { 
-    if(world.getHighlightMode() == "add") {
-      self.addBlock(self.offset.x+x,self.offset.y+y,self.offset.z+z, 2);
-    } else {
-      self.removeBlock(self.offset.x+x,self.offset.y+y,self.offset.z+z);
+    
+    try {
+      self.emit("click", self.offset.x+x, self.offset.y+y, self.offset.z+z);
+      if(world.getHighlightMode() == "add") {
+        self.addBlock(self.offset.x+x,self.offset.y+y,self.offset.z+z, 2);
+      } else {
+        self.removeBlock(self.offset.x+x,self.offset.y+y,self.offset.z+z);
+      }
+    } catch(e) {
+      // When some game determines the change can't be done.
     }
   });
   
@@ -91,6 +98,11 @@ Game.prototype.resetWorld = function(x, y, z) {
   this.offset = {x:x, y:1, z:z};
   this.emit("offsetChanged", this.offset);
   world.player.moveTo(0,1,0);
+}
+    
+Game.prototype.getPos = function() {
+  var self = this;
+  return {x: world.player.yaw.position.x+self.offset.x, y:world.player.yaw.position.y+self.offset.y, z:world.player.yaw.position.z+self.offset.z};
 }
     
 Game.prototype.setPos = function(x,y,z) {

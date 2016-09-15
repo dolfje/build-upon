@@ -35,12 +35,6 @@ module.exports = function() {
   var drawer = osmDrawer.Drawer(game, game.scene, avatar)
   game.osmDrawer = drawer;
 
-  //var start_x = 32000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
-  //var start_z = 24000 * Math.pow(2, osm.ZOOM-16) * 256 * osm.M_PER_PIXEL;
-  var start_x = 21322808
-  var start_z = 13906911
-  avatar.yaw.position.set(start_x, 2, start_z)
-  
   setHighlighter(game);
   
   game.player = avatar;
@@ -61,14 +55,16 @@ function setHighlighter(game) {
       return !removeBlock;
     }
   });
-  hl.on('highlight', function (voxelPos) { block = voxelPos });
+  hl.on('highlight', function (voxelPos) { block = voxelPos; removeBlock = true });
   hl.on('remove', function (voxelPos) { block = null });
-  hl.on('highlight-adjacent', function (voxelPos) { block = voxelPos });
+  hl.on('highlight-adjacent', function (voxelPos) { block = voxelPos; removeBlock = false });
   hl.on('remove-adjacent', function (voxelPos) { block = null });
 
   // block interaction stuff, uses highlight data
   game.on('fire', function (target, state) {
-    game.emit("click", block[0], block[1], block[2]);
+    if(block) {
+      game.emit("click", block[0], block[1], block[2]);
+    }
   });
   
   game.getHighlightMode = function() {
